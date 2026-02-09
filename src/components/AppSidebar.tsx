@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useStore } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
+import { useProducts } from "@/hooks/useProducts";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -20,10 +21,20 @@ const navItems = [
   { path: "/reports", label: "Reports", icon: BarChart3 },
 ];
 
-export default function AppSidebar() {
+interface AppSidebarProps {
+  onNavigate?: () => void;
+}
+
+export default function AppSidebar({ onNavigate }: AppSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout, lowStockCount } = useStore();
+  const { profile, signOut } = useAuth();
+  const { lowStockCount } = useProducts();
+
+  const handleNav = (path: string) => {
+    navigate(path);
+    onNavigate?.();
+  };
 
   return (
     <aside className="flex h-screen w-64 flex-col bg-sidebar text-sidebar-foreground">
@@ -46,7 +57,7 @@ export default function AppSidebar() {
           return (
             <button
               key={item.path}
-              onClick={() => navigate(item.path)}
+              onClick={() => handleNav(item.path)}
               className={cn(
                 "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                 isActive
@@ -70,20 +81,20 @@ export default function AppSidebar() {
       </nav>
 
       {/* User section */}
-      {user && (
+      {profile && (
         <div className="border-t border-sidebar-border px-4 py-4">
           <div className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-accent text-xs font-bold text-sidebar-accent-foreground">
-              {user.name.charAt(0).toUpperCase()}
+              {profile.full_name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-sidebar-accent-foreground truncate">
-                {user.name}
+                {profile.full_name}
               </p>
-              <p className="text-xs text-sidebar-foreground/60 capitalize">{user.role}</p>
+              <p className="text-xs text-sidebar-foreground/60 capitalize">{profile.role}</p>
             </div>
             <button
-              onClick={() => { logout(); navigate("/login"); }}
+              onClick={() => { signOut(); navigate("/login"); }}
               className="rounded-md p-1.5 text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
               title="Sign out"
             >

@@ -1,39 +1,64 @@
 import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
-import { useStore } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Store, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [role, setRole] = useState<"admin" | "manager" | "cashier">("cashier");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { login, isAuthenticated } = useStore();
+  const { signIn, signUp, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
 
   if (isAuthenticated) return <Navigate to="/" replace />;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!username.trim()) {
-      setError("Please enter a username");
-      return;
-    }
-    if (!password.trim()) {
-      setError("Please enter a password");
-      return;
-    }
-    const success = login(username, password);
-    if (success) {
-      navigate("/", { replace: true });
-    } else {
-      setError("Invalid credentials");
+    setLoading(true);
+
+    try {
+      if (isSignUp) {
+        if (!fullName.trim()) { setError("Please enter your full name"); setLoading(false); return; }
+        const { error } = await signUp(email, password, fullName.trim(), role);
+        if (error) { setError(error); setLoading(false); return; }
+        toast.success("Account created! You're now signed in.");
+        navigate("/", { replace: true });
+      } else {
+        const { error } = await signIn(email, password);
+        if (error) { setError(error); setLoading(false); return; }
+        navigate("/", { replace: true });
+      }
+    } catch {
+      setError("An unexpected error occurred");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -54,16 +79,14 @@ export default function Login() {
           <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary-foreground/20 backdrop-blur-sm">
             <Store className="h-10 w-10 text-primary-foreground" />
           </div>
-          <h1 className="text-4xl font-extrabold text-primary-foreground mb-4">
-            Swift-Mart
-          </h1>
+          <h1 className="text-4xl font-extrabold text-primary-foreground mb-4">Swift-Mart</h1>
           <p className="text-lg text-primary-foreground/80 max-w-sm">
             Streamline your retail operations with intelligent inventory and sales management.
           </p>
         </motion.div>
       </div>
 
-      {/* Right login form */}
+      {/* Right form */}
       <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-12 bg-background">
         <motion.div
           initial={{ opacity: 0, x: 20 }}
@@ -71,7 +94,6 @@ export default function Login() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="w-full max-w-md"
         >
-          {/* Mobile branding */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-brand">
               <Store className="h-5 w-5 text-primary-foreground" />
@@ -80,34 +102,46 @@ export default function Login() {
           </div>
 
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-foreground">Welcome back</h2>
+            <h2 className="text-2xl font-bold text-foreground">
+              {isSignUp ? "Create an account" : "Welcome back"}
+            </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Sign in to access your dashboard
+              {isSignUp ? "Sign up to get started" : "Sign in to access your dashboard"}
             </p>
           </div>
 
           <Card className="shadow-card border-border/50">
             <CardContent className="p-6">
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {isSignUp && (
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input
+                      id="fullName"
+                      placeholder="Enter your full name"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="h-11"
+                    />
+                  </div>
+                )}
+
                 <div className="space-y-2">
-                  <Label htmlFor="username" className="text-sm font-medium">
-                    Username
-                  </Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input
-                    id="username"
-                    type="text"
-                    placeholder="Enter your username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="h-11"
-                    autoComplete="username"
+                    autoComplete="email"
+                    required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium">
-                    Password
-                  </Label>
+                  <Label htmlFor="password">Password</Label>
                   <div className="relative">
                     <Input
                       id="password"
@@ -116,7 +150,9 @@ export default function Login() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="h-11 pr-10"
-                      autoComplete="current-password"
+                      autoComplete={isSignUp ? "new-password" : "current-password"}
+                      required
+                      minLength={6}
                     />
                     <button
                       type="button"
@@ -128,19 +164,39 @@ export default function Login() {
                   </div>
                 </div>
 
-                {error && (
-                  <p className="text-sm text-destructive font-medium">{error}</p>
+                {isSignUp && (
+                  <div className="space-y-2">
+                    <Label>Role</Label>
+                    <Select value={role} onValueChange={(v) => setRole(v as typeof role)}>
+                      <SelectTrigger className="h-11">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="manager">Manager</SelectItem>
+                        <SelectItem value="cashier">Cashier</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 )}
 
-                <Button type="submit" className="w-full h-11 font-semibold">
-                  Sign In
+                {error && <p className="text-sm text-destructive font-medium">{error}</p>}
+
+                <Button type="submit" className="w-full h-11 font-semibold" disabled={loading}>
+                  {loading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
                 </Button>
               </form>
             </CardContent>
           </Card>
 
-          <p className="mt-6 text-center text-xs text-muted-foreground">
-            Demo: Use <span className="font-mono text-foreground/70">admin</span> / <span className="font-mono text-foreground/70">manager</span> / <span className="font-mono text-foreground/70">cashier</span> as username with any password
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+            <button
+              onClick={() => { setIsSignUp(!isSignUp); setError(""); }}
+              className="font-semibold text-primary hover:underline"
+            >
+              {isSignUp ? "Sign in" : "Sign up"}
+            </button>
           </p>
         </motion.div>
       </div>
