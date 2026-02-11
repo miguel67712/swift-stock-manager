@@ -12,9 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Store, Eye, EyeOff } from "lucide-react";
-import { motion } from "framer-motion";
+import { Store, Eye, EyeOff, ShoppingCart, Package, BarChart3 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+
+const floatingIcons = [
+  { Icon: ShoppingCart, x: "15%", y: "20%", delay: 0 },
+  { Icon: Package, x: "75%", y: "35%", delay: 0.5 },
+  { Icon: BarChart3, x: "25%", y: "70%", delay: 1 },
+  { Icon: Store, x: "80%", y: "75%", delay: 1.5 },
+];
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -31,7 +38,11 @@ export default function Login() {
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        <motion.div
+          className="rounded-full h-10 w-10 border-b-2 border-primary"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        />
       </div>
     );
   }
@@ -66,138 +77,257 @@ export default function Login() {
     <div className="flex min-h-screen">
       {/* Left branding panel */}
       <div className="hidden lg:flex lg:w-1/2 gradient-brand items-center justify-center p-12 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 h-64 w-64 rounded-full bg-primary-foreground/20 blur-3xl" />
-          <div className="absolute bottom-20 right-20 h-80 w-80 rounded-full bg-primary-foreground/10 blur-3xl" />
-        </div>
+        {/* Animated background blobs */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          className="absolute top-20 left-20 h-64 w-64 rounded-full bg-primary-foreground/10 blur-3xl"
+          animate={{ scale: [1, 1.2, 1], x: [0, 30, 0], y: [0, -20, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-20 right-20 h-80 w-80 rounded-full bg-primary-foreground/5 blur-3xl"
+          animate={{ scale: [1, 1.3, 1], x: [0, -20, 0], y: [0, 30, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        />
+        <motion.div
+          className="absolute top-1/2 left-1/3 h-40 w-40 rounded-full bg-primary-foreground/8 blur-2xl"
+          animate={{ scale: [1, 1.5, 1], rotate: [0, 180, 360] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
+
+        {/* Floating icons */}
+        {floatingIcons.map(({ Icon, x, y, delay }, i) => (
+          <motion.div
+            key={i}
+            className="absolute text-primary-foreground/15"
+            style={{ left: x, top: y }}
+            animate={{ y: [0, -15, 0], rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 4 + i, repeat: Infinity, ease: "easeInOut", delay }}
+          >
+            <Icon className="h-8 w-8" />
+          </motion.div>
+        ))}
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="relative z-10 text-center"
         >
-          <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary-foreground/20 backdrop-blur-sm">
+          <motion.div
+            className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary-foreground/20 backdrop-blur-sm"
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            whileHover={{ scale: 1.1, rotate: 5 }}
+          >
             <Store className="h-10 w-10 text-primary-foreground" />
-          </div>
-          <h1 className="text-4xl font-extrabold text-primary-foreground mb-4">Swift-Mart</h1>
-          <p className="text-lg text-primary-foreground/80 max-w-sm">
+          </motion.div>
+          <motion.h1
+            className="text-4xl font-extrabold text-primary-foreground mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+          >
+            Swift-Mart
+          </motion.h1>
+          <motion.p
+            className="text-lg text-primary-foreground/80 max-w-sm"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+          >
             Streamline your retail operations with intelligent inventory and sales management.
-          </p>
+          </motion.p>
         </motion.div>
       </div>
 
       {/* Right form */}
       <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-12 bg-background">
         <motion.div
-          initial={{ opacity: 0, x: 20 }}
+          initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-md"
         >
-          <div className="lg:hidden flex items-center gap-3 mb-8">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-brand">
+          <motion.div
+            className="lg:hidden flex items-center gap-3 mb-8"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <motion.div
+              className="flex h-10 w-10 items-center justify-center rounded-xl gradient-brand"
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <Store className="h-5 w-5 text-primary-foreground" />
-            </div>
+            </motion.div>
             <h1 className="text-2xl font-extrabold text-foreground">Swift-Mart</h1>
-          </div>
+          </motion.div>
 
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-foreground">
-              {isSignUp ? "Create an account" : "Welcome back"}
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {isSignUp ? "Sign up to get started" : "Sign in to access your dashboard"}
-            </p>
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={isSignUp ? "signup" : "signin"}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.3 }}
+              className="mb-8"
+            >
+              <h2 className="text-2xl font-bold text-foreground">
+                {isSignUp ? "Create an account" : "Welcome back"}
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {isSignUp ? "Sign up to get started" : "Sign in to access your dashboard"}
+              </p>
+            </motion.div>
+          </AnimatePresence>
 
-          <Card className="shadow-card border-border/50">
-            <CardContent className="p-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {isSignUp && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            <Card className="shadow-card border-border/50 hover-glow">
+              <CardContent className="p-6">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <AnimatePresence mode="wait">
+                    {isSignUp && (
+                      <motion.div
+                        key="fullName"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-2 overflow-hidden"
+                      >
+                        <Label htmlFor="fullName">Full Name</Label>
+                        <Input
+                          id="fullName"
+                          placeholder="Enter your full name"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          className="h-11"
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   <div className="space-y-2">
-                    <Label htmlFor="fullName">Full Name</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
-                      id="fullName"
-                      placeholder="Enter your full name"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       className="h-11"
-                    />
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="h-11"
-                    autoComplete="email"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="h-11 pr-10"
-                      autoComplete={isSignUp ? "new-password" : "current-password"}
+                      autoComplete="email"
                       required
-                      minLength={6}
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
                   </div>
-                </div>
 
-                {isSignUp && (
                   <div className="space-y-2">
-                    <Label>Role</Label>
-                    <Select value={role} onValueChange={(v) => setRole(v as typeof role)}>
-                      <SelectTrigger className="h-11">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="manager">Manager</SelectItem>
-                        <SelectItem value="cashier">Cashier</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="h-11 pr-10"
+                        autoComplete={isSignUp ? "new-password" : "current-password"}
+                        required
+                        minLength={6}
+                      />
+                      <motion.button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        whileTap={{ scale: 0.85 }}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </motion.button>
+                    </div>
                   </div>
-                )}
 
-                {error && <p className="text-sm text-destructive font-medium">{error}</p>}
+                  <AnimatePresence mode="wait">
+                    {isSignUp && (
+                      <motion.div
+                        key="role"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-2 overflow-hidden"
+                      >
+                        <Label>Role</Label>
+                        <Select value={role} onValueChange={(v) => setRole(v as typeof role)}>
+                          <SelectTrigger className="h-11">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="manager">Manager</SelectItem>
+                            <SelectItem value="cashier">Cashier</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
-                <Button type="submit" className="w-full h-11 font-semibold" disabled={loading}>
-                  {loading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+                  <AnimatePresence mode="wait">
+                    {error && (
+                      <motion.p
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 10 }}
+                        className="text-sm text-destructive font-medium"
+                      >
+                        {error}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
+                  <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}>
+                    <Button type="submit" className="w-full h-11 font-semibold" disabled={loading}>
+                      {loading ? (
+                        <motion.span
+                          className="flex items-center gap-2"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                        >
+                          <motion.span
+                            className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full"
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          />
+                          Please wait...
+                        </motion.span>
+                      ) : isSignUp ? "Create Account" : "Sign In"}
+                    </Button>
+                  </motion.div>
+                </form>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.p
+            className="mt-6 text-center text-sm text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
             {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
-            <button
+            <motion.button
               onClick={() => { setIsSignUp(!isSignUp); setError(""); }}
               className="font-semibold text-primary hover:underline"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               {isSignUp ? "Sign in" : "Sign up"}
-            </button>
-          </p>
+            </motion.button>
+          </motion.p>
         </motion.div>
       </div>
     </div>

@@ -1,18 +1,30 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import AppSidebar from "./AppSidebar";
 import { useState } from "react";
 import { Menu } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+
+const pageVariants: Variants = {
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" as const } },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.2 } },
+};
 
 export default function AppLayout() {
   const { isAuthenticated, isLoading } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
 
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        <motion.div
+          className="rounded-full h-10 w-10 border-b-2 border-primary"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        />
       </div>
     );
   }
@@ -37,15 +49,34 @@ export default function AppLayout() {
 
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Mobile header */}
-        <header className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-border bg-card">
-          <button onClick={() => setMobileOpen(true)} className="p-1.5 rounded-md hover:bg-muted transition-colors">
+        <motion.header
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-border bg-card"
+        >
+          <motion.button
+            onClick={() => setMobileOpen(true)}
+            className="p-1.5 rounded-md hover:bg-muted transition-colors"
+            whileTap={{ scale: 0.9 }}
+          >
             <Menu className="h-5 w-5" />
-          </button>
+          </motion.button>
           <h1 className="text-base font-bold text-foreground">Swift-Mart</h1>
-        </header>
+        </motion.header>
 
         <main className="flex-1 overflow-auto">
-          <Outlet />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              variants={pageVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
     </div>
