@@ -13,7 +13,7 @@ import {
   ArrowUpRight,
   Clock,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import {
   AreaChart,
   Area,
@@ -26,9 +26,19 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 
-const fadeIn = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
+const container: Variants = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { staggerChildren: 0.1 } },
+};
+
+const item: Variants = {
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring" as const, stiffness: 300, damping: 24 } },
+};
+
+const slideUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
 };
 
 export default function Dashboard() {
@@ -40,7 +50,6 @@ export default function Dashboard() {
 
   const unresolvedAlerts = alerts.filter((a) => !a.resolved);
 
-  // Build chart data from actual sales over last 7 days
   const chartData = useMemo(() => {
     const data = [];
     for (let i = 6; i >= 0; i--) {
@@ -95,58 +104,85 @@ export default function Dashboard() {
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+      >
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-foreground">
             Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}, {profile?.full_name}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">Here's what's happening at your store today</p>
         </div>
-        <button
+        <motion.button
           onClick={() => navigate("/pos")}
           className="hidden sm:flex items-center gap-2 rounded-lg gradient-brand px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 transition-opacity"
+          whileHover={{ scale: 1.05, boxShadow: "0 8px 25px -5px rgba(0,0,0,0.2)" }}
+          whileTap={{ scale: 0.95 }}
         >
           <ShoppingCart className="h-4 w-4" />
           Open POS
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {statCards.map((stat, i) => {
+      <motion.div
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+        variants={container}
+        initial="hidden"
+        animate="show"
+      >
+        {statCards.map((stat) => {
           const Icon = stat.icon;
           return (
-            <motion.div key={stat.title} variants={fadeIn} initial="initial" animate="animate" transition={{ delay: i * 0.1, duration: 0.4 }}>
-              <Card className="shadow-card hover:shadow-card-hover transition-shadow">
+            <motion.div key={stat.title} variants={item}>
+              <Card className="shadow-card hover-lift cursor-default">
                 <CardContent className="p-4 sm:p-5">
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">{stat.title}</p>
-                      <p className="mt-1 sm:mt-2 text-lg sm:text-2xl font-bold font-mono text-foreground">{stat.value}</p>
+                      <motion.p
+                        className="mt-1 sm:mt-2 text-lg sm:text-2xl font-bold font-mono text-foreground"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3, duration: 0.4 }}
+                      >
+                        {stat.value}
+                      </motion.p>
                       <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-xs text-muted-foreground">{stat.subtitle}</p>
                     </div>
-                    <div className={`rounded-lg p-2 sm:p-2.5 ${stat.bg}`}>
+                    <motion.div
+                      className={`rounded-lg p-2 sm:p-2.5 ${stat.bg}`}
+                      whileHover={{ rotate: 15, scale: 1.1 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                    >
                       <Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${stat.color}`} />
-                    </div>
+                    </motion.div>
                   </div>
                 </CardContent>
               </Card>
             </motion.div>
           );
         })}
-      </div>
+      </motion.div>
 
       {/* Charts & alerts row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <motion.div className="lg:col-span-2" variants={fadeIn} initial="initial" animate="animate" transition={{ delay: 0.4 }}>
-          <Card className="shadow-card">
+        <motion.div className="lg:col-span-2" variants={slideUp} initial="hidden" animate="show" transition={{ delay: 0.4 }}>
+          <Card className="shadow-card hover-glow">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base font-semibold">Sales Overview</CardTitle>
-                <div className="flex items-center gap-1.5 text-xs text-success font-medium">
+                <motion.div
+                  className="flex items-center gap-1.5 text-xs text-success font-medium"
+                  animate={{ opacity: [0.7, 1, 0.7] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
                   <TrendingUp className="h-3.5 w-3.5" />
                   Last 7 days
-                </div>
+                </motion.div>
               </div>
             </CardHeader>
             <CardContent className="pt-0">
@@ -171,28 +207,51 @@ export default function Dashboard() {
           </Card>
         </motion.div>
 
-        <motion.div variants={fadeIn} initial="initial" animate="animate" transition={{ delay: 0.5 }}>
-          <Card className="shadow-card h-full">
+        <motion.div variants={slideUp} initial="hidden" animate="show" transition={{ delay: 0.5 }}>
+          <Card className="shadow-card h-full hover-glow">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base font-semibold">Stock Alerts</CardTitle>
-                <button onClick={() => navigate("/alerts")} className="text-xs font-medium text-primary hover:underline flex items-center gap-1">
+                <motion.button
+                  onClick={() => navigate("/alerts")}
+                  className="text-xs font-medium text-primary hover:underline flex items-center gap-1"
+                  whileHover={{ x: 3 }}
+                >
                   View all <ArrowUpRight className="h-3 w-3" />
-                </button>
+                </motion.button>
               </div>
             </CardHeader>
             <CardContent className="space-y-3 pt-0">
               {unresolvedAlerts.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">All stock levels are healthy ✓</p>
+                <motion.p
+                  className="text-sm text-muted-foreground text-center py-8"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  All stock levels are healthy ✓
+                </motion.p>
               ) : (
-                unresolvedAlerts.slice(0, 5).map((alert) => (
-                  <div key={alert.id} className={`flex items-center gap-3 rounded-lg border p-3 ${alert.alert_type === "out_of_stock" ? "stock-critical" : "stock-warning"}`}>
-                    <AlertTriangle className="h-4 w-4 shrink-0" />
+                unresolvedAlerts.slice(0, 5).map((alert, i) => (
+                  <motion.div
+                    key={alert.id}
+                    className={`flex items-center gap-3 rounded-lg border p-3 ${alert.alert_type === "out_of_stock" ? "stock-critical" : "stock-warning"}`}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 + i * 0.1 }}
+                    whileHover={{ x: 4, transition: { duration: 0.2 } }}
+                  >
+                    <motion.div
+                      animate={alert.alert_type === "out_of_stock" ? { scale: [1, 1.2, 1] } : {}}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      <AlertTriangle className="h-4 w-4 shrink-0" />
+                    </motion.div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{alert.product_name}</p>
                       <p className="text-xs opacity-75">{alert.alert_type === "out_of_stock" ? "Out of stock" : `${alert.current_quantity} left`}</p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))
               )}
             </CardContent>
@@ -201,12 +260,21 @@ export default function Dashboard() {
       </div>
 
       {/* Recent transactions */}
-      <motion.div variants={fadeIn} initial="initial" animate="animate" transition={{ delay: 0.6 }}>
-        <Card className="shadow-card">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+      >
+        <Card className="shadow-card hover-glow">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base font-semibold">Recent Transactions</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              >
+                <Clock className="h-4 w-4 text-muted-foreground" />
+              </motion.div>
             </div>
           </CardHeader>
           <CardContent className="pt-0">
@@ -222,8 +290,14 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {sales.slice(0, 6).map((sale) => (
-                    <tr key={sale.id} className="hover:bg-muted/50 transition-colors">
+                  {sales.slice(0, 6).map((sale, i) => (
+                    <motion.tr
+                      key={sale.id}
+                      className="hover:bg-muted/50 transition-colors"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.7 + i * 0.08 }}
+                    >
                       <td className="py-3 font-mono text-xs text-muted-foreground">{sale.transaction_id}</td>
                       <td className="py-3 hidden sm:table-cell">
                         <span className="text-sm">{sale.sale_items?.map((i) => i.product_name).join(", ") || "-"}</span>
@@ -233,7 +307,7 @@ export default function Dashboard() {
                       </td>
                       <td className="py-3 text-sm text-muted-foreground hidden sm:table-cell">{sale.cashier_name}</td>
                       <td className="py-3 text-right font-mono font-semibold">${Number(sale.total).toFixed(2)}</td>
-                    </tr>
+                    </motion.tr>
                   ))}
                   {sales.length === 0 && (
                     <tr>
