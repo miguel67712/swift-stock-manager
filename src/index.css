@@ -13,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 221 83% 53%;
+    --primary: 140 50% 30%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 14% 96%;
@@ -36,21 +36,21 @@
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 221 83% 53%;
+    --ring: 140 50% 30%;
 
     --radius: 0.75rem;
 
     --sidebar-background: 222 47% 11%;
     --sidebar-foreground: 215 20% 75%;
-    --sidebar-primary: 221 83% 60%;
+    --sidebar-primary: 140 50% 40%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 222 35% 18%;
     --sidebar-accent-foreground: 215 20% 90%;
     --sidebar-border: 222 35% 18%;
-    --sidebar-ring: 221 83% 53%;
+    --sidebar-ring: 140 50% 30%;
 
-    --chart-1: 221 83% 53%;
-    --chart-2: 152 69% 31%;
+    --chart-1: 140 50% 30%;
+    --chart-2: 30 90% 50%;
     --chart-3: 38 92% 50%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
@@ -65,7 +65,7 @@
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 221 83% 53%;
+    --primary: 140 50% 30%;
     --primary-foreground: 0 0% 100%;
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
@@ -84,12 +84,12 @@
     --ring: 213 27% 84%;
     --sidebar-background: 222 47% 6%;
     --sidebar-foreground: 240 5% 96%;
-    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary: 140 50% 40%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 4% 16%;
     --sidebar-accent-foreground: 240 5% 96%;
     --sidebar-border: 240 4% 16%;
-    --sidebar-ring: 221 83% 53%;
+    --sidebar-ring: 140 50% 30%;
   }
 }
 
@@ -113,7 +113,7 @@
   }
 
   .gradient-brand {
-    background: linear-gradient(135deg, hsl(221 83% 53%), hsl(250 83% 60%));
+    background: linear-gradient(135deg, hsl(140 50% 30%), hsl(30 90% 50%));
   }
 
   .shadow-card {
