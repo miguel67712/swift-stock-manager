@@ -5,13 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Store, Eye, EyeOff, ShoppingCart, Package, BarChart3 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -24,15 +17,12 @@ const floatingIcons = [
 ];
 
 export default function Login() {
-  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [role, setRole] = useState<"admin" | "manager" | "cashier">("cashier");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { signIn, signUp, isAuthenticated, isLoading } = useAuth();
+  const { signIn, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -55,17 +45,9 @@ export default function Login() {
     setLoading(true);
 
     try {
-      if (isSignUp) {
-        if (!fullName.trim()) { setError("Please enter your full name"); setLoading(false); return; }
-        const { error } = await signUp(email, password, fullName.trim(), role);
-        if (error) { setError(error); setLoading(false); return; }
-        toast.success("Account created! You're now signed in.");
-        navigate("/", { replace: true });
-      } else {
-        const { error } = await signIn(email, password);
-        if (error) { setError(error); setLoading(false); return; }
-        navigate("/", { replace: true });
-      }
+      const { error } = await signIn(email, password);
+      if (error) { setError(error); setLoading(false); return; }
+      navigate("/", { replace: true });
     } catch {
       setError("An unexpected error occurred");
     } finally {
@@ -77,7 +59,6 @@ export default function Login() {
     <div className="flex min-h-screen">
       {/* Left branding panel */}
       <div className="hidden lg:flex lg:w-1/2 gradient-brand items-center justify-center p-12 relative overflow-hidden">
-        {/* Animated background blobs */}
         <motion.div
           className="absolute top-20 left-20 h-64 w-64 rounded-full bg-primary-foreground/10 blur-3xl"
           animate={{ scale: [1, 1.2, 1], x: [0, 30, 0], y: [0, -20, 0] }}
@@ -88,13 +69,7 @@ export default function Login() {
           animate={{ scale: [1, 1.3, 1], x: [0, -20, 0], y: [0, 30, 0] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
         />
-        <motion.div
-          className="absolute top-1/2 left-1/3 h-40 w-40 rounded-full bg-primary-foreground/8 blur-2xl"
-          animate={{ scale: [1, 1.5, 1], rotate: [0, 180, 360] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        />
 
-        {/* Floating icons */}
         {floatingIcons.map(({ Icon, x, y, delay }, i) => (
           <motion.div
             key={i}
@@ -135,12 +110,12 @@ export default function Login() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
-            Streamline your retail operations with intelligent inventory and sales management.
+            Gestion intelligente de stock et ventes pour votre commerce.
           </motion.p>
         </motion.div>
       </div>
 
-      {/* Right form */}
+      {/* Right form - NO signup, NO role selector */}
       <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-12 bg-background">
         <motion.div
           initial={{ opacity: 0, x: 30 }}
@@ -164,23 +139,12 @@ export default function Login() {
             <h1 className="text-2xl font-extrabold text-foreground">Swift-Mart</h1>
           </motion.div>
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={isSignUp ? "signup" : "signin"}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.3 }}
-              className="mb-8"
-            >
-              <h2 className="text-2xl font-bold text-foreground">
-                {isSignUp ? "Create an account" : "Welcome back"}
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {isSignUp ? "Sign up to get started" : "Sign in to access your dashboard"}
-              </p>
-            </motion.div>
-          </AnimatePresence>
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-foreground">Connexion</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Connectez-vous pour accéder à votre espace
+            </p>
+          </div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -190,34 +154,12 @@ export default function Login() {
             <Card className="shadow-card border-border/50 hover-glow">
               <CardContent className="p-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <AnimatePresence mode="wait">
-                    {isSignUp && (
-                      <motion.div
-                        key="fullName"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="space-y-2 overflow-hidden"
-                      >
-                        <Label htmlFor="fullName">Full Name</Label>
-                        <Input
-                          id="fullName"
-                          placeholder="Enter your full name"
-                          value={fullName}
-                          onChange={(e) => setFullName(e.target.value)}
-                          className="h-11"
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder="you@example.com"
+                      placeholder="you@swift-mart.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="h-11"
@@ -227,16 +169,16 @@ export default function Login() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">Mot de passe</Label>
                     <div className="relative">
                       <Input
                         id="password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="Enter your password"
+                        placeholder="Entrer votre mot de passe"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="h-11 pr-10"
-                        autoComplete={isSignUp ? "new-password" : "current-password"}
+                        autoComplete="current-password"
                         required
                         minLength={6}
                       />
@@ -250,31 +192,6 @@ export default function Login() {
                       </motion.button>
                     </div>
                   </div>
-
-                  <AnimatePresence mode="wait">
-                    {isSignUp && (
-                      <motion.div
-                        key="role"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="space-y-2 overflow-hidden"
-                      >
-                        <Label>Role</Label>
-                        <Select value={role} onValueChange={(v) => setRole(v as typeof role)}>
-                          <SelectTrigger className="h-11">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="admin">Admin</SelectItem>
-                            <SelectItem value="manager">Manager</SelectItem>
-                            <SelectItem value="cashier">Cashier</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
 
                   <AnimatePresence mode="wait">
                     {error && (
@@ -302,9 +219,9 @@ export default function Login() {
                             animate={{ rotate: 360 }}
                             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                           />
-                          Please wait...
+                          Connexion...
                         </motion.span>
-                      ) : isSignUp ? "Create Account" : "Sign In"}
+                      ) : "Se Connecter"}
                     </Button>
                   </motion.div>
                 </form>
@@ -318,15 +235,7 @@ export default function Login() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
           >
-            {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
-            <motion.button
-              onClick={() => { setIsSignUp(!isSignUp); setError(""); }}
-              className="font-semibold text-primary hover:underline"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {isSignUp ? "Sign in" : "Sign up"}
-            </motion.button>
+            Contactez votre administrateur pour obtenir un accès.
           </motion.p>
         </motion.div>
       </div>
