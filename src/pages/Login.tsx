@@ -229,14 +229,31 @@ export default function Login() {
             </Card>
           </motion.div>
 
-          <motion.p
-            className="mt-6 text-center text-sm text-muted-foreground"
+          <motion.button
+            type="button"
+            className="mt-4 w-full text-center text-sm text-primary hover:underline font-medium"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
+            transition={{ delay: 0.5 }}
+            onClick={() => toast.info("Contactez votre administrateur pour réinitialiser votre mot de passe.")}
           >
-            Contactez votre administrateur pour obtenir un accès.
-          </motion.p>
+            Mot de passe oublié?
+          </motion.button>
+
+          <motion.div
+            className="mt-6 rounded-lg border border-border bg-muted/50 p-4"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7, duration: 0.4 }}
+          >
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Comptes démo</p>
+            <div className="space-y-1.5 text-xs text-muted-foreground font-mono">
+              <p>admin@swift-mart.com</p>
+              <p>manager@swift-mart.com</p>
+              <p>cashier@swift-mart.com</p>
+              <p className="text-[10px] mt-2 font-sans text-muted-foreground/70">(Mot de passe: password123)</p>
+            </div>
+          </motion.div>
         </motion.div>
       </div>
     </div>
