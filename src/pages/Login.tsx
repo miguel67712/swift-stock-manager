@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Store, Eye, EyeOff, ShoppingCart, Package, BarChart3 } from "lucide-react";
+import { Store, Eye, EyeOff, ShoppingCart, Package, BarChart3, Globe } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
@@ -23,16 +24,13 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { signIn, isAuthenticated, isLoading } = useAuth();
+  const { t, toggleLang, lang } = useI18n();
   const navigate = useNavigate();
 
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
-        <motion.div
-          className="rounded-full h-10 w-10 border-b-2 border-primary"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-        />
+        <motion.div className="rounded-full h-10 w-10 border-b-2 border-primary" animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} />
       </div>
     );
   }
@@ -43,7 +41,6 @@ export default function Login() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       const { error } = await signIn(email, password);
       if (error) { setError(error); setLoading(false); return; }
@@ -59,169 +56,78 @@ export default function Login() {
     <div className="flex min-h-screen">
       {/* Left branding panel */}
       <div className="hidden lg:flex lg:w-1/2 gradient-brand items-center justify-center p-12 relative overflow-hidden">
-        <motion.div
-          className="absolute top-20 left-20 h-64 w-64 rounded-full bg-primary-foreground/10 blur-3xl"
-          animate={{ scale: [1, 1.2, 1], x: [0, 30, 0], y: [0, -20, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-20 right-20 h-80 w-80 rounded-full bg-primary-foreground/5 blur-3xl"
-          animate={{ scale: [1, 1.3, 1], x: [0, -20, 0], y: [0, 30, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        />
+        <motion.div className="absolute top-20 left-20 h-64 w-64 rounded-full bg-primary-foreground/10 blur-3xl" animate={{ scale: [1, 1.2, 1], x: [0, 30, 0], y: [0, -20, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} />
+        <motion.div className="absolute bottom-20 right-20 h-80 w-80 rounded-full bg-primary-foreground/5 blur-3xl" animate={{ scale: [1, 1.3, 1], x: [0, -20, 0], y: [0, 30, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }} />
 
         {floatingIcons.map(({ Icon, x, y, delay }, i) => (
-          <motion.div
-            key={i}
-            className="absolute text-primary-foreground/15"
-            style={{ left: x, top: y }}
-            animate={{ y: [0, -15, 0], rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 4 + i, repeat: Infinity, ease: "easeInOut", delay }}
-          >
+          <motion.div key={i} className="absolute text-primary-foreground/15" style={{ left: x, top: y }} animate={{ y: [0, -15, 0], rotate: [0, 10, -10, 0] }} transition={{ duration: 4 + i, repeat: Infinity, ease: "easeInOut", delay }}>
             <Icon className="h-8 w-8" />
           </motion.div>
         ))}
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="relative z-10 text-center"
-        >
-          <motion.div
-            className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary-foreground/20 backdrop-blur-sm"
-            animate={{ y: [0, -8, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            whileHover={{ scale: 1.1, rotate: 5 }}
-          >
+        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="relative z-10 text-center">
+          <motion.div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary-foreground/20 backdrop-blur-sm" animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} whileHover={{ scale: 1.1, rotate: 5 }}>
             <Store className="h-10 w-10 text-primary-foreground" />
           </motion.div>
-          <motion.h1
-            className="text-4xl font-extrabold text-primary-foreground mb-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-          >
-            Swift-Mart
-          </motion.h1>
-          <motion.p
-            className="text-lg text-primary-foreground/80 max-w-sm"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-          >
-            Gestion intelligente de stock et ventes pour votre commerce.
-          </motion.p>
+          <motion.h1 className="text-4xl font-extrabold text-primary-foreground mb-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }}>Swift-Mart</motion.h1>
+          <motion.p className="text-lg text-primary-foreground/80 max-w-sm" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.6 }}>{t("login.branding")}</motion.p>
         </motion.div>
       </div>
 
-      {/* Right form - NO signup, NO role selector */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-12 bg-background">
-        <motion.div
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-md"
+      {/* Right form */}
+      <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-12 bg-background relative">
+        {/* Language toggle */}
+        <motion.button
+          onClick={toggleLang}
+          className="absolute top-4 right-4 flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shadow-sm"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
-          <motion.div
-            className="lg:hidden flex items-center gap-3 mb-8"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <motion.div
-              className="flex h-10 w-10 items-center justify-center rounded-xl gradient-brand"
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-            >
+          <Globe className="h-3.5 w-3.5" />
+          {lang === "fr" ? "English" : "Français"}
+        </motion.button>
+
+        <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="w-full max-w-md">
+          <motion.div className="lg:hidden flex items-center gap-3 mb-8" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <motion.div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-brand" whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.95 }}>
               <Store className="h-5 w-5 text-primary-foreground" />
             </motion.div>
             <h1 className="text-2xl font-extrabold text-foreground">Swift-Mart</h1>
           </motion.div>
 
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-foreground">Connexion</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Connectez-vous pour accéder à votre espace
-            </p>
+            <h2 className="text-2xl font-bold text-foreground">{t("login.title")}</h2>
+            <p className="mt-2 text-sm text-muted-foreground">{t("login.subtitle")}</p>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}>
             <Card className="shadow-card border-border/50 hover-glow">
               <CardContent className="p-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@swift-mart.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="h-11"
-                      autoComplete="email"
-                      required
-                    />
+                    <Label htmlFor="email">{t("login.email")}</Label>
+                    <Input id="email" type="email" placeholder="you@swift-mart.com" value={email} onChange={(e) => setEmail(e.target.value)} className="h-11" autoComplete="email" required />
                   </div>
-
                   <div className="space-y-2">
-                    <Label htmlFor="password">Mot de passe</Label>
+                    <Label htmlFor="password">{t("login.password")}</Label>
                     <div className="relative">
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Entrer votre mot de passe"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="h-11 pr-10"
-                        autoComplete="current-password"
-                        required
-                        minLength={6}
-                      />
-                      <motion.button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                        whileTap={{ scale: 0.85 }}
-                      >
+                      <Input id="password" type={showPassword ? "text" : "password"} placeholder={t("login.passwordPlaceholder")} value={password} onChange={(e) => setPassword(e.target.value)} className="h-11 pr-10" autoComplete="current-password" required minLength={6} />
+                      <motion.button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" whileTap={{ scale: 0.85 }}>
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </motion.button>
                     </div>
                   </div>
-
                   <AnimatePresence mode="wait">
-                    {error && (
-                      <motion.p
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 10 }}
-                        className="text-sm text-destructive font-medium"
-                      >
-                        {error}
-                      </motion.p>
-                    )}
+                    {error && <motion.p initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} className="text-sm text-destructive font-medium">{error}</motion.p>}
                   </AnimatePresence>
-
                   <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}>
                     <Button type="submit" className="w-full h-11 font-semibold" disabled={loading}>
                       {loading ? (
-                        <motion.span
-                          className="flex items-center gap-2"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                        >
-                          <motion.span
-                            className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full"
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          />
-                          Connexion...
+                        <motion.span className="flex items-center gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                          <motion.span className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full" animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} />
+                          {t("login.connecting")}
                         </motion.span>
-                      ) : "Se Connecter"}
+                      ) : t("login.signIn")}
                     </Button>
                   </motion.div>
                 </form>
@@ -229,29 +135,17 @@ export default function Login() {
             </Card>
           </motion.div>
 
-          <motion.button
-            type="button"
-            className="mt-4 w-full text-center text-sm text-primary hover:underline font-medium"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            onClick={() => toast.info("Contactez votre administrateur pour réinitialiser votre mot de passe.")}
-          >
-            Mot de passe oublié?
+          <motion.button type="button" className="mt-4 w-full text-center text-sm text-primary hover:underline font-medium" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} onClick={() => toast.info(t("login.forgotMsg"))}>
+            {t("login.forgot")}
           </motion.button>
 
-          <motion.div
-            className="mt-6 rounded-lg border border-border bg-muted/50 p-4"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.4 }}
-          >
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Comptes démo</p>
+          <motion.div className="mt-6 rounded-lg border border-border bg-muted/50 p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.4 }}>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{t("login.demoAccounts")}</p>
             <div className="space-y-1.5 text-xs text-muted-foreground font-mono">
               <p>admin@swift-mart.com</p>
               <p>manager@swift-mart.com</p>
               <p>cashier@swift-mart.com</p>
-              <p className="text-[10px] mt-2 font-sans text-muted-foreground/70">(Mot de passe: password123)</p>
+              <p className="text-[10px] mt-2 font-sans text-muted-foreground/70">({t("login.demoPassword")})</p>
             </div>
           </motion.div>
         </motion.div>

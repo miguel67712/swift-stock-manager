@@ -1,18 +1,11 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
-import { LayoutDashboard, ShoppingCart, Package, AlertTriangle, BarChart3, LogOut, Store } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import { LayoutDashboard, ShoppingCart, Package, AlertTriangle, BarChart3, LogOut, Store, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { motion, type Variants } from "framer-motion";
-
-const navItems = [
-  { path: "/", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/pos", label: "Caisse (POS)", icon: ShoppingCart },
-  { path: "/products", label: "Produits", icon: Package },
-  { path: "/alerts", label: "Alertes", icon: AlertTriangle },
-  { path: "/reports", label: "Rapports", icon: BarChart3 },
-];
 
 interface AppSidebarProps { onNavigate?: () => void; }
 
@@ -24,7 +17,16 @@ export default function AppSidebar({ onNavigate }: AppSidebarProps) {
   const navigate = useNavigate();
   const { profile, signOut } = useAuth();
   const { lowStockCount } = useProducts();
+  const { t, toggleLang, lang } = useI18n();
   const handleNav = (path: string) => { navigate(path); onNavigate?.(); };
+
+  const navItems = [
+    { path: "/", label: t("nav.dashboard"), icon: LayoutDashboard },
+    { path: "/pos", label: t("nav.pos"), icon: ShoppingCart },
+    { path: "/products", label: t("nav.products"), icon: Package },
+    { path: "/alerts", label: t("nav.alerts"), icon: AlertTriangle },
+    { path: "/reports", label: t("nav.reports"), icon: BarChart3 },
+  ];
 
   return (
     <aside className="flex h-screen w-64 flex-col bg-sidebar text-sidebar-foreground">
@@ -32,7 +34,7 @@ export default function AppSidebar({ onNavigate }: AppSidebarProps) {
         <motion.div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-brand" whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.95 }}>
           <Store className="h-5 w-5 text-primary-foreground" />
         </motion.div>
-        <div><h1 className="text-base font-bold text-sidebar-accent-foreground">Swift-Mart</h1><p className="text-xs text-sidebar-foreground/60">Inventaire & Ventes</p></div>
+        <div><h1 className="text-base font-bold text-sidebar-accent-foreground">Swift-Mart</h1><p className="text-xs text-sidebar-foreground/60">{t("sidebar.subtitle")}</p></div>
       </motion.div>
 
       <motion.nav className="flex-1 space-y-1 px-3 py-4" variants={sidebarVariants} initial="hidden" animate="visible">
@@ -51,6 +53,19 @@ export default function AppSidebar({ onNavigate }: AppSidebarProps) {
             </motion.button>
           );
         })}
+
+        {/* Language toggle */}
+        <motion.button
+          variants={navItemVariants}
+          onClick={toggleLang}
+          whileHover={{ x: 4, transition: { duration: 0.2 } }}
+          whileTap={{ scale: 0.97 }}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all duration-200 mt-4 border-t border-sidebar-border pt-4"
+        >
+          <Globe className="h-4.5 w-4.5 shrink-0" />
+          <span>{lang === "fr" ? "English" : "Français"}</span>
+          <Badge variant="secondary" className="ml-auto text-[10px] font-bold">{lang.toUpperCase()}</Badge>
+        </motion.button>
       </motion.nav>
 
       {profile && (
@@ -58,7 +73,7 @@ export default function AppSidebar({ onNavigate }: AppSidebarProps) {
           <div className="flex items-center gap-3">
             <motion.div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-accent text-xs font-bold text-sidebar-accent-foreground" whileHover={{ scale: 1.15 }}>{profile.full_name.charAt(0).toUpperCase()}</motion.div>
             <div className="flex-1 min-w-0"><p className="text-sm font-medium text-sidebar-accent-foreground truncate">{profile.full_name}</p><p className="text-xs text-sidebar-foreground/60 capitalize">{profile.role}</p></div>
-            <motion.button onClick={() => { signOut(); navigate("/login"); }} className="rounded-md p-1.5 text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors" title="Déconnexion" whileHover={{ rotate: -15 }} whileTap={{ scale: 0.9 }}><LogOut className="h-4 w-4" /></motion.button>
+            <motion.button onClick={() => { signOut(); navigate("/login"); }} className="rounded-md p-1.5 text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors" title={t("sidebar.logout")} whileHover={{ rotate: -15 }} whileTap={{ scale: 0.9 }}><LogOut className="h-4 w-4" /></motion.button>
           </div>
         </motion.div>
       )}
