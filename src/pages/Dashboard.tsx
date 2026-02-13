@@ -2,6 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { useSales } from "@/hooks/useSales";
 import { useAlerts } from "@/hooks/useAlerts";
+import { useI18n } from "@/lib/i18n";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -14,18 +15,9 @@ import { useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 import { formatXAF } from "@/lib/currency";
 
-const container: Variants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.1 } },
-};
-const item: Variants = {
-  hidden: { opacity: 0, y: 20, scale: 0.95 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring" as const, stiffness: 300, damping: 24 } },
-};
-const slideUp: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
-};
+const container: Variants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
+const item: Variants = { hidden: { opacity: 0, y: 20, scale: 0.95 }, show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring" as const, stiffness: 300, damping: 24 } } };
+const slideUp: Variants = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } } };
 
 export default function Dashboard() {
   const { profile } = useAuth();
@@ -33,6 +25,7 @@ export default function Dashboard() {
   const { sales, todaysSalesTotal, todaysSalesCount } = useSales();
   const { alerts } = useAlerts();
   const navigate = useNavigate();
+  const { t } = useI18n();
   const unresolvedAlerts = alerts.filter((a) => !a.resolved);
 
   const chartData = useMemo(() => {
@@ -47,21 +40,21 @@ export default function Dashboard() {
   }, [sales]);
 
   const statCards = [
-    { title: "Ventes du Jour", value: formatXAF(todaysSalesTotal), subtitle: `${todaysSalesCount} transactions`, icon: DollarSign, color: "text-success", bg: "bg-success/10" },
-    { title: "Total Produits", value: products.length.toString(), subtitle: "En inventaire", icon: Package, color: "text-primary", bg: "bg-primary/10" },
-    { title: "Stock Faible", value: lowStockCount.toString(), subtitle: "Besoin d'attention", icon: AlertTriangle, color: "text-warning", bg: "bg-warning/10" },
-    { title: "Total Ventes", value: sales.length.toString(), subtitle: "Depuis le début", icon: ShoppingCart, color: "text-primary", bg: "bg-primary/10" },
+    { title: t("dash.todaySales"), value: formatXAF(todaysSalesTotal), subtitle: `${todaysSalesCount} ${t("dash.transactions")}`, icon: DollarSign, color: "text-success", bg: "bg-success/10" },
+    { title: t("dash.totalProducts"), value: products.length.toString(), subtitle: t("dash.inInventory"), icon: Package, color: "text-primary", bg: "bg-primary/10" },
+    { title: t("dash.lowStock"), value: lowStockCount.toString(), subtitle: t("dash.needsAttention"), icon: AlertTriangle, color: "text-warning", bg: "bg-warning/10" },
+    { title: t("dash.totalSales"), value: sales.length.toString(), subtitle: t("dash.sinceStart"), icon: ShoppingCart, color: "text-primary", bg: "bg-primary/10" },
   ];
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Bonjour, {profile?.full_name}</h1>
-          <p className="text-sm text-muted-foreground mt-1">Voici un aperçu de votre magasin aujourd'hui</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t("dash.greeting")}, {profile?.full_name}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t("dash.subtitle")}</p>
         </div>
         <motion.button onClick={() => navigate("/pos")} className="hidden sm:flex items-center gap-2 rounded-lg gradient-brand px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 transition-opacity" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <ShoppingCart className="h-4 w-4" /> Ouvrir Caisse
+          <ShoppingCart className="h-4 w-4" /> {t("dash.openPOS")}
         </motion.button>
       </motion.div>
 
@@ -85,7 +78,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <motion.div className="lg:col-span-2" variants={slideUp} initial="hidden" animate="show" transition={{ delay: 0.4 }}>
           <Card className="shadow-card hover-glow">
-            <CardHeader className="pb-2"><div className="flex items-center justify-between"><CardTitle className="text-base font-semibold">Aperçu des Ventes</CardTitle><motion.div className="flex items-center gap-1.5 text-xs text-success font-medium" animate={{ opacity: [0.7, 1, 0.7] }} transition={{ duration: 2, repeat: Infinity }}><TrendingUp className="h-3.5 w-3.5" />7 derniers jours</motion.div></div></CardHeader>
+            <CardHeader className="pb-2"><div className="flex items-center justify-between"><CardTitle className="text-base font-semibold">{t("dash.salesOverview")}</CardTitle><motion.div className="flex items-center gap-1.5 text-xs text-success font-medium" animate={{ opacity: [0.7, 1, 0.7] }} transition={{ duration: 2, repeat: Infinity }}><TrendingUp className="h-3.5 w-3.5" />{t("dash.last7days")}</motion.div></div></CardHeader>
             <CardContent className="pt-0"><div className="h-[200px] sm:h-[260px]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData}>
@@ -93,7 +86,7 @@ export default function Dashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(220 13% 91%)" />
                   <XAxis dataKey="date" tick={{ fontSize: 11, fill: "hsl(220 9% 46%)" }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: "hsl(220 9% 46%)" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${Math.round(v / 1000)}k`} />
-                  <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(220 13% 91%)", fontSize: "13px" }} formatter={(value: number) => [formatXAF(value), "Revenue"]} />
+                  <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(220 13% 91%)", fontSize: "13px" }} formatter={(value: number) => [formatXAF(value), t("dash.revenue")]} />
                   <Area type="monotone" dataKey="sales" stroke="hsl(140 50% 30%)" strokeWidth={2.5} fill="url(#salesGradient)" />
                 </AreaChart>
               </ResponsiveContainer>
@@ -103,16 +96,16 @@ export default function Dashboard() {
 
         <motion.div variants={slideUp} initial="hidden" animate="show" transition={{ delay: 0.5 }}>
           <Card className="shadow-card h-full hover-glow">
-            <CardHeader className="pb-3"><div className="flex items-center justify-between"><CardTitle className="text-base font-semibold">⚠️ Alerte Stock</CardTitle><motion.button onClick={() => navigate("/alerts")} className="text-xs font-medium text-primary hover:underline flex items-center gap-1" whileHover={{ x: 3 }}>Voir tout <ArrowUpRight className="h-3 w-3" /></motion.button></div></CardHeader>
+            <CardHeader className="pb-3"><div className="flex items-center justify-between"><CardTitle className="text-base font-semibold">{t("dash.stockAlert")}</CardTitle><motion.button onClick={() => navigate("/alerts")} className="text-xs font-medium text-primary hover:underline flex items-center gap-1" whileHover={{ x: 3 }}>{t("dash.viewAll")} <ArrowUpRight className="h-3 w-3" /></motion.button></div></CardHeader>
             <CardContent className="space-y-3 pt-0">
               {unresolvedAlerts.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">Tous les niveaux de stock sont bons ✓</p>
+                <p className="text-sm text-muted-foreground text-center py-8">{t("dash.allGood")}</p>
               ) : unresolvedAlerts.slice(0, 5).map((alert, i) => (
                 <motion.div key={alert.id} className={`flex items-center gap-3 rounded-lg border p-3 ${alert.alert_type === "out_of_stock" ? "stock-critical" : "stock-warning"}`} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 + i * 0.1 }} whileHover={{ x: 4, transition: { duration: 0.2 } }}>
                   <AlertTriangle className="h-4 w-4 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{alert.product_name}</p>
-                    <p className="text-xs opacity-75">{alert.alert_type === "out_of_stock" ? "Rupture de stock" : `${alert.current_quantity} restant(s)`}</p>
+                    <p className="text-xs opacity-75">{alert.alert_type === "out_of_stock" ? t("dash.outOfStock") : `${alert.current_quantity} ${t("dash.remaining")}`}</p>
                   </div>
                 </motion.div>
               ))}
@@ -123,15 +116,15 @@ export default function Dashboard() {
 
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.5 }}>
         <Card className="shadow-card hover-glow">
-          <CardHeader className="pb-3"><div className="flex items-center justify-between"><CardTitle className="text-base font-semibold">Transactions Récentes</CardTitle><Clock className="h-4 w-4 text-muted-foreground" /></div></CardHeader>
+          <CardHeader className="pb-3"><div className="flex items-center justify-between"><CardTitle className="text-base font-semibold">{t("dash.recentTransactions")}</CardTitle><Clock className="h-4 w-4 text-muted-foreground" /></div></CardHeader>
           <CardContent className="pt-0"><div className="overflow-x-auto -mx-6 px-6">
             <table className="w-full text-sm min-w-[500px]">
               <thead><tr className="border-b">
-                <th className="pb-3 text-left text-xs font-medium text-muted-foreground uppercase">Transaction</th>
-                <th className="pb-3 text-left text-xs font-medium text-muted-foreground uppercase hidden sm:table-cell">Articles</th>
-                <th className="pb-3 text-left text-xs font-medium text-muted-foreground uppercase">Paiement</th>
-                <th className="pb-3 text-left text-xs font-medium text-muted-foreground uppercase hidden sm:table-cell">Caissier</th>
-                <th className="pb-3 text-right text-xs font-medium text-muted-foreground uppercase">Total</th>
+                <th className="pb-3 text-left text-xs font-medium text-muted-foreground uppercase">{t("dash.transaction")}</th>
+                <th className="pb-3 text-left text-xs font-medium text-muted-foreground uppercase hidden sm:table-cell">{t("dash.items")}</th>
+                <th className="pb-3 text-left text-xs font-medium text-muted-foreground uppercase">{t("dash.payment")}</th>
+                <th className="pb-3 text-left text-xs font-medium text-muted-foreground uppercase hidden sm:table-cell">{t("dash.cashier")}</th>
+                <th className="pb-3 text-right text-xs font-medium text-muted-foreground uppercase">{t("dash.total")}</th>
               </tr></thead>
               <tbody className="divide-y">
                 {sales.slice(0, 6).map((sale, i) => (
@@ -143,7 +136,7 @@ export default function Dashboard() {
                     <td className="py-3 text-right font-mono font-semibold">{formatXAF(Number(sale.total))}</td>
                   </motion.tr>
                 ))}
-                {sales.length === 0 && <tr><td colSpan={5} className="py-8 text-center text-muted-foreground text-sm">Aucune transaction</td></tr>}
+                {sales.length === 0 && <tr><td colSpan={5} className="py-8 text-center text-muted-foreground text-sm">{t("dash.noTransactions")}</td></tr>}
               </tbody>
             </table>
           </div></CardContent>

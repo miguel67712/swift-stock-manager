@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAlerts } from "@/hooks/useAlerts";
 import { useProducts } from "@/hooks/useProducts";
+import { useI18n } from "@/lib/i18n";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +18,7 @@ export default function Alerts() {
   const { isAdminOrManager } = useAuth();
   const { alerts, resolveAlert } = useAlerts();
   const { products } = useProducts();
+  const { t } = useI18n();
   const [filter, setFilter] = useState<FilterType>("all");
 
   const filteredAlerts = useMemo(() => {
@@ -33,27 +35,27 @@ export default function Alerts() {
   const lowStockCount = alerts.filter((a) => a.alert_type === "low_stock" && !a.resolved).length;
 
   const handleResolve = async (id: string, name: string) => {
-    try { await resolveAlert.mutateAsync(id); toast.success(`Alerte pour ${name} résolue`); }
-    catch (err: any) { toast.error(err.message || "Erreur"); }
+    try { await resolveAlert.mutateAsync(id); toast.success(t("alert.alertResolved", { name })); }
+    catch (err: any) { toast.error(err.message || t("common.error")); }
   };
 
   const filterButtons: { key: FilterType; label: string; count: number }[] = [
-    { key: "all", label: "Tout", count: alerts.length },
-    { key: "out_of_stock", label: "Rupture", count: outOfStockCount },
-    { key: "low_stock", label: "Stock Faible", count: lowStockCount },
-    { key: "resolved", label: "Résolues", count: alerts.filter((a) => a.resolved).length },
+    { key: "all", label: t("alert.all"), count: alerts.length },
+    { key: "out_of_stock", label: t("alert.rupture"), count: outOfStockCount },
+    { key: "low_stock", label: t("alert.lowStock"), count: lowStockCount },
+    { key: "resolved", label: t("alert.resolved"), count: alerts.filter((a) => a.resolved).length },
   ];
 
   const summaryCards = [
-    { count: outOfStockCount, label: "Rupture de Stock", icon: XCircle, color: "text-destructive", bg: "bg-destructive/10", border: "border-l-destructive" },
-    { count: lowStockCount, label: "Stock Faible", icon: AlertTriangle, color: "text-warning", bg: "bg-warning/10", border: "border-l-warning" },
-    { count: products.filter((p) => p.quantity > p.min_threshold).length, label: "Stock Sain", icon: CheckCircle2, color: "text-success", bg: "bg-success/10", border: "border-l-success" },
+    { count: outOfStockCount, label: t("alert.outOfStock"), icon: XCircle, color: "text-destructive", bg: "bg-destructive/10", border: "border-l-destructive" },
+    { count: lowStockCount, label: t("alert.lowStock"), icon: AlertTriangle, color: "text-warning", bg: "bg-warning/10", border: "border-l-warning" },
+    { count: products.filter((p) => p.quantity > p.min_threshold).length, label: t("alert.healthyStock"), icon: CheckCircle2, color: "text-success", bg: "bg-success/10", border: "border-l-success" },
   ];
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
-      <div><h1 className="text-xl sm:text-2xl font-bold text-foreground">Alertes Inventaire</h1>
-        <p className="text-sm text-muted-foreground mt-1">{unresolvedCount > 0 ? `${unresolvedCount} article(s) nécessite(nt) attention` : "Tous les niveaux de stock sont bons"}</p>
+      <div><h1 className="text-xl sm:text-2xl font-bold text-foreground">{t("alert.title")}</h1>
+        <p className="text-sm text-muted-foreground mt-1">{unresolvedCount > 0 ? `${unresolvedCount} ${t("alert.needAttention")}` : t("alert.allGood")}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
@@ -75,7 +77,7 @@ export default function Alerts() {
       <motion.div className="space-y-3" variants={container} initial="hidden" animate="show">
         <AnimatePresence mode="popLayout">
           {filteredAlerts.length === 0 ? (
-            <div className="py-16 text-center"><CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-success/30" /><p className="text-muted-foreground">Aucune alerte</p></div>
+            <div className="py-16 text-center"><CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-success/30" /><p className="text-muted-foreground">{t("alert.noAlerts")}</p></div>
           ) : filteredAlerts.map((alert) => (
             <motion.div key={alert.id} variants={alertItem} layout exit={{ opacity: 0, x: -50 }}>
               <Card className={`shadow-card hover-lift ${alert.resolved ? "opacity-60" : alert.alert_type === "out_of_stock" ? "border-l-4 border-l-destructive" : "border-l-4 border-l-warning"}`}><CardContent className="p-4">
@@ -84,10 +86,10 @@ export default function Alerts() {
                     {alert.resolved ? <CheckCircle2 className="h-5 w-5 text-muted-foreground" /> : alert.alert_type === "out_of_stock" ? <XCircle className="h-5 w-5 text-destructive" /> : <AlertTriangle className="h-5 w-5 text-warning" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap"><h3 className="font-semibold truncate">{alert.product_name}</h3><Badge variant={alert.resolved ? "secondary" : "destructive"} className="text-[10px]">{alert.resolved ? "Résolue" : alert.alert_type === "out_of_stock" ? "RUPTURE" : "STOCK FAIBLE"}</Badge></div>
-                    <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground"><span>Stock: {alert.previous_quantity} → {alert.current_quantity}</span><span className="flex items-center gap-1"><Clock className="h-3 w-3" />{new Date(alert.created_at).toLocaleDateString()}</span></div>
+                    <div className="flex items-center gap-2 flex-wrap"><h3 className="font-semibold truncate">{alert.product_name}</h3><Badge variant={alert.resolved ? "secondary" : "destructive"} className="text-[10px]">{alert.resolved ? t("alert.resolved") : alert.alert_type === "out_of_stock" ? "RUPTURE" : t("alert.lowStock").toUpperCase()}</Badge></div>
+                    <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground"><span>{t("alert.stockLabel")}: {alert.previous_quantity} → {alert.current_quantity}</span><span className="flex items-center gap-1"><Clock className="h-3 w-3" />{new Date(alert.created_at).toLocaleDateString()}</span></div>
                   </div>
-                  {!alert.resolved && isAdminOrManager && <Button size="sm" variant="outline" onClick={() => handleResolve(alert.id, alert.product_name)} disabled={resolveAlert.isPending} className="shrink-0">Résoudre</Button>}
+                  {!alert.resolved && isAdminOrManager && <Button size="sm" variant="outline" onClick={() => handleResolve(alert.id, alert.product_name)} disabled={resolveAlert.isPending} className="shrink-0">{t("alert.resolve")}</Button>}
                 </div>
               </CardContent></Card>
             </motion.div>
