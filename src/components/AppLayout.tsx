@@ -13,7 +13,7 @@ const pageVariants: Variants = {
 };
 
 export default function AppLayout() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, profile } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
@@ -31,6 +31,15 @@ export default function AppLayout() {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Cashier gets a full-screen POS without sidebar
+  if (profile?.role === "cashier") {
+    return (
+      <div className="h-screen overflow-hidden bg-background">
+        <Outlet />
+      </div>
+    );
   }
 
   return (
