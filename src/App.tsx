@@ -8,8 +8,7 @@ import { I18nProvider } from "@/lib/i18n";
 import AppLayout from "@/components/AppLayout";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
-import POS from "./pages/POS";
+import RoleHome from "./pages/RoleHome";
 import Products from "./pages/Products";
 import Alerts from "./pages/Alerts";
 import Reports from "./pages/Reports";
@@ -29,8 +28,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route element={<AppLayout />}>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/pos" element={<POS />} />
+                <Route path="/" element={<RoleHome />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/alerts" element={<Alerts />} />
                 <Route path="/reports" element={<Reports />} />

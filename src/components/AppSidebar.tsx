@@ -2,10 +2,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { useI18n } from "@/lib/i18n";
-import { LayoutDashboard, ShoppingCart, Package, AlertTriangle, BarChart3, LogOut, Store, Globe } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, Package, AlertTriangle, BarChart3, LogOut, Store, Globe, Shield, Users, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { motion, type Variants } from "framer-motion";
+import { useMemo } from "react";
 
 interface AppSidebarProps { onNavigate?: () => void; }
 
@@ -20,13 +21,32 @@ export default function AppSidebar({ onNavigate }: AppSidebarProps) {
   const { t, toggleLang, lang } = useI18n();
   const handleNav = (path: string) => { navigate(path); onNavigate?.(); };
 
-  const navItems = [
-    { path: "/", label: t("nav.dashboard"), icon: LayoutDashboard },
-    { path: "/pos", label: t("nav.pos"), icon: ShoppingCart },
-    { path: "/products", label: t("nav.products"), icon: Package },
-    { path: "/alerts", label: t("nav.alerts"), icon: AlertTriangle },
-    { path: "/reports", label: t("nav.reports"), icon: BarChart3 },
-  ];
+  const role = profile?.role;
+
+  const navItems = useMemo(() => {
+    if (role === "admin") {
+      return [
+        { path: "/", label: t("nav.dashboard"), icon: Shield },
+        { path: "/products", label: t("nav.products"), icon: Package },
+        { path: "/alerts", label: t("nav.alerts"), icon: AlertTriangle },
+        { path: "/reports", label: t("nav.reports"), icon: BarChart3 },
+      ];
+    }
+    if (role === "manager") {
+      return [
+        { path: "/", label: t("nav.dashboard"), icon: BarChart3 },
+        { path: "/products", label: t("nav.products"), icon: Package },
+        { path: "/alerts", label: t("nav.alerts"), icon: AlertTriangle },
+        { path: "/reports", label: t("nav.reports"), icon: BarChart3 },
+      ];
+    }
+    // cashier - minimal nav
+    return [
+      { path: "/", label: t("nav.pos"), icon: ShoppingCart },
+    ];
+  }, [role, t]);
+
+  const roleLabel = role === "admin" ? "Admin" : role === "manager" ? "Manager" : "Caissier";
 
   return (
     <aside className="flex h-screen w-64 flex-col bg-sidebar text-sidebar-foreground">
@@ -34,7 +54,10 @@ export default function AppSidebar({ onNavigate }: AppSidebarProps) {
         <motion.div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-brand" whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.95 }}>
           <Store className="h-5 w-5 text-primary-foreground" />
         </motion.div>
-        <div><h1 className="text-base font-bold text-sidebar-accent-foreground">Swift-Mart</h1><p className="text-xs text-sidebar-foreground/60">{t("sidebar.subtitle")}</p></div>
+        <div>
+          <h1 className="text-base font-bold text-sidebar-accent-foreground">Swift-Mart</h1>
+          <p className="text-xs text-sidebar-foreground/60">{roleLabel}</p>
+        </div>
       </motion.div>
 
       <motion.nav className="flex-1 space-y-1 px-3 py-4" variants={sidebarVariants} initial="hidden" animate="visible">
