@@ -147,6 +147,19 @@ const translations = {
   "login.demoAccounts": { fr: "Comptes démo", en: "Demo accounts" },
   "login.demoPassword": { fr: "Mot de passe: password123", en: "Password: password123" },
   "login.branding": { fr: "Gestion intelligente de stock et ventes pour votre commerce.", en: "Smart inventory and sales management for your business." },
+  "login.noAccount": { fr: "Pas encore de compte?", en: "Don't have an account?" },
+  "login.registerLink": { fr: "Créer un compte", en: "Create account" },
+
+  // Register
+  "register.title": { fr: "Créer un Compte", en: "Create Account" },
+  "register.subtitle": { fr: "Inscrivez-vous pour commencer", en: "Sign up to get started" },
+  "register.fullName": { fr: "Nom Complet", en: "Full Name" },
+  "register.fullNamePlaceholder": { fr: "Votre nom complet", en: "Your full name" },
+  "register.signUp": { fr: "S'inscrire", en: "Sign Up" },
+  "register.creating": { fr: "Création...", en: "Creating..." },
+  "register.hasAccount": { fr: "Déjà un compte?", en: "Already have an account?" },
+  "register.loginLink": { fr: "Se connecter", en: "Sign in" },
+  "register.passwordMin": { fr: "Le mot de passe doit contenir au moins 6 caractères", en: "Password must be at least 6 characters" },
 
   // Common
   "common.error": { fr: "Erreur", en: "Error" },

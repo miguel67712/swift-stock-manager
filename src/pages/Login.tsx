@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { useNavigate, Navigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
@@ -138,6 +138,11 @@ export default function Login() {
           <motion.button type="button" className="mt-4 w-full text-center text-sm text-primary hover:underline font-medium" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} onClick={() => toast.info(t("login.forgotMsg"))}>
             {t("login.forgot")}
           </motion.button>
+
+          <p className="mt-3 text-center text-sm text-muted-foreground">
+            {t("login.noAccount")}{" "}
+            <Link to="/register" className="text-primary hover:underline font-medium">{t("login.registerLink")}</Link>
+          </p>
 
           <motion.div className="mt-6 rounded-lg border border-border bg-muted/50 p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.4 }}>
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{t("login.demoAccounts")}</p>
