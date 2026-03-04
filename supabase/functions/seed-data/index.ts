@@ -16,9 +16,9 @@ Deno.serve(async (req) => {
 
   // Create demo users
   const demoUsers = [
-    { email: "admin@swift-mart.com", password: "password123", full_name: "Admin Swift", role: "admin" },
-    { email: "manager@swift-mart.com", password: "password123", full_name: "Manager Swift", role: "manager" },
-    { email: "cashier@swift-mart.com", password: "password123", full_name: "Cashier Swift", role: "cashier" },
+    { email: "admin@swift-mart.com", password: "admin123", full_name: "Administrateur", role: "admin" },
+    { email: "manager@swift-mart.com", password: "manager123", full_name: "Manager Swift", role: "manager" },
+    { email: "client@swift-mart.com", password: "client123", full_name: "Client Demo", role: "client" },
   ];
 
   for (const u of demoUsers) {
