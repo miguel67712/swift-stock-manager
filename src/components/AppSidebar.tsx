@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { useI18n } from "@/lib/i18n";
-import { LayoutDashboard, ShoppingCart, Package, AlertTriangle, BarChart3, LogOut, Store, Globe, Shield, Users, Settings } from "lucide-react";
+import { LayoutDashboard, Package, AlertTriangle, BarChart3, LogOut, Store, Globe, Shield, Users, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { motion, type Variants } from "framer-motion";
@@ -26,7 +26,7 @@ export default function AppSidebar({ onNavigate }: AppSidebarProps) {
   const navItems = useMemo(() => {
     if (role === "admin") {
       return [
-        { path: "/", label: t("nav.dashboard"), icon: Shield },
+        { path: "/", label: "Dashboard", icon: Shield },
         { path: "/products", label: t("nav.products"), icon: Package },
         { path: "/alerts", label: t("nav.alerts"), icon: AlertTriangle },
         { path: "/reports", label: t("nav.reports"), icon: BarChart3 },
@@ -34,19 +34,16 @@ export default function AppSidebar({ onNavigate }: AppSidebarProps) {
     }
     if (role === "manager") {
       return [
-        { path: "/", label: t("nav.dashboard"), icon: BarChart3 },
+        { path: "/", label: "Dashboard", icon: BarChart3 },
         { path: "/products", label: t("nav.products"), icon: Package },
         { path: "/alerts", label: t("nav.alerts"), icon: AlertTriangle },
         { path: "/reports", label: t("nav.reports"), icon: BarChart3 },
       ];
     }
-    // cashier - minimal nav
-    return [
-      { path: "/", label: t("nav.pos"), icon: ShoppingCart },
-    ];
+    return [];
   }, [role, t]);
 
-  const roleLabel = role === "admin" ? "Admin" : role === "manager" ? "Manager" : "Caissier";
+  const roleLabel = role === "admin" ? "Admin" : role === "manager" ? "Manager" : "Client";
 
   return (
     <aside className="flex h-screen w-64 flex-col bg-sidebar text-sidebar-foreground">
@@ -77,14 +74,8 @@ export default function AppSidebar({ onNavigate }: AppSidebarProps) {
           );
         })}
 
-        {/* Language toggle */}
-        <motion.button
-          variants={navItemVariants}
-          onClick={toggleLang}
-          whileHover={{ x: 4, transition: { duration: 0.2 } }}
-          whileTap={{ scale: 0.97 }}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all duration-200 mt-4 border-t border-sidebar-border pt-4"
-        >
+        <motion.button variants={navItemVariants} onClick={toggleLang} whileHover={{ x: 4, transition: { duration: 0.2 } }} whileTap={{ scale: 0.97 }}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all duration-200 mt-4 border-t border-sidebar-border pt-4">
           <Globe className="h-4.5 w-4.5 shrink-0" />
           <span>{lang === "fr" ? "English" : "Français"}</span>
           <Badge variant="secondary" className="ml-auto text-[10px] font-bold">{lang.toUpperCase()}</Badge>
