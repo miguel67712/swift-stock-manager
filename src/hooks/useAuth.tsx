@@ -6,7 +6,7 @@ interface Profile {
   id: string;
   full_name: string;
   username: string;
-  role: "admin" | "manager" | "cashier";
+  role: "admin" | "manager" | "cashier" | "client";
 }
 
 interface AuthContextType {
@@ -17,7 +17,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isAdminOrManager: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string, fullName: string, role: "admin" | "manager" | "cashier") => Promise<{ error: string | null }>;
+  signUp: (email: string, password: string, fullName: string, role: "admin" | "manager" | "cashier" | "client") => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -51,7 +51,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          // Use setTimeout to avoid Supabase auth deadlock
           setTimeout(() => fetchProfile(session.user.id), 0);
         } else {
           setProfile(null);
@@ -77,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message ?? null };
   }, []);
 
-  const signUp = useCallback(async (email: string, password: string, fullName: string, role: "admin" | "manager" | "cashier") => {
+  const signUp = useCallback(async (email: string, password: string, fullName: string, role: "admin" | "manager" | "cashier" | "client") => {
     const { error } = await supabase.auth.signUp({
       email,
       password,

@@ -228,6 +228,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      deduct_stock: {
+        Args: { p_product_id: string; p_quantity: number }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -238,7 +242,7 @@ export type Database = {
       is_admin_or_manager: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "manager" | "cashier"
+      app_role: "admin" | "manager" | "cashier" | "client"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -366,7 +370,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "manager", "cashier"],
+      app_role: ["admin", "manager", "cashier", "client"],
     },
   },
 } as const

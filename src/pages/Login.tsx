@@ -58,13 +58,11 @@ export default function Login() {
       <div className="hidden lg:flex lg:w-1/2 gradient-brand items-center justify-center p-12 relative overflow-hidden">
         <motion.div className="absolute top-20 left-20 h-64 w-64 rounded-full bg-primary-foreground/10 blur-3xl" animate={{ scale: [1, 1.2, 1], x: [0, 30, 0], y: [0, -20, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} />
         <motion.div className="absolute bottom-20 right-20 h-80 w-80 rounded-full bg-primary-foreground/5 blur-3xl" animate={{ scale: [1, 1.3, 1], x: [0, -20, 0], y: [0, 30, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }} />
-
         {floatingIcons.map(({ Icon, x, y, delay }, i) => (
           <motion.div key={i} className="absolute text-primary-foreground/15" style={{ left: x, top: y }} animate={{ y: [0, -15, 0], rotate: [0, 10, -10, 0] }} transition={{ duration: 4 + i, repeat: Infinity, ease: "easeInOut", delay }}>
             <Icon className="h-8 w-8" />
           </motion.div>
         ))}
-
         <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="relative z-10 text-center">
           <motion.div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary-foreground/20 backdrop-blur-sm" animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} whileHover={{ scale: 1.1, rotate: 5 }}>
             <Store className="h-10 w-10 text-primary-foreground" />
@@ -76,15 +74,8 @@ export default function Login() {
 
       {/* Right form */}
       <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-12 bg-background relative">
-        {/* Language toggle */}
-        <motion.button
-          onClick={toggleLang}
-          className="absolute top-4 right-4 flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shadow-sm"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Globe className="h-3.5 w-3.5" />
-          {lang === "fr" ? "English" : "Français"}
+        <motion.button onClick={toggleLang} className="absolute top-4 right-4 flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shadow-sm" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Globe className="h-3.5 w-3.5" /> {lang === "fr" ? "English" : "Français"}
         </motion.button>
 
         <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="w-full max-w-md">
@@ -139,18 +130,12 @@ export default function Login() {
             {t("login.forgot")}
           </motion.button>
 
-          <p className="mt-3 text-center text-sm text-muted-foreground">
-            {t("login.noAccount")}{" "}
-            <Link to="/register" className="text-primary hover:underline font-medium">{t("login.registerLink")}</Link>
-          </p>
-
           <motion.div className="mt-6 rounded-lg border border-border bg-muted/50 p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.4 }}>
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{t("login.demoAccounts")}</p>
             <div className="space-y-1.5 text-xs text-muted-foreground font-mono">
-              <p>admin@swift-mart.com</p>
-              <p>manager@swift-mart.com</p>
-              <p>cashier@swift-mart.com</p>
-              <p className="text-[10px] mt-2 font-sans text-muted-foreground/70">({t("login.demoPassword")})</p>
+              <p>👑 admin@swift-mart.com (admin123)</p>
+              <p>📊 manager@swift-mart.com (manager123)</p>
+              <p>👤 client@swift-mart.com (client123)</p>
             </div>
           </motion.div>
         </motion.div>
