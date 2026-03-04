@@ -74,19 +74,12 @@ export function useSales() {
       const { error: itemsError } = await supabase.from("sale_items").insert(saleItems);
       if (itemsError) throw itemsError;
 
-      // 3. Deduct stock for each product
+      // 3. Deduct stock using security definer function
       for (const item of saleData.items) {
-        const { data: product } = await supabase
-          .from("products")
-          .select("quantity")
-          .eq("id", item.productId)
-          .single();
-        if (product) {
-          await supabase
-            .from("products")
-            .update({ quantity: Math.max(0, product.quantity - item.quantity) })
-            .eq("id", item.productId);
-        }
+        await supabase.rpc("deduct_stock", {
+          p_product_id: item.productId,
+          p_quantity: item.quantity,
+        });
       }
 
       return { ...sale, sale_items: saleItems } as SaleWithItems;
