@@ -7,7 +7,6 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { I18nProvider } from "@/lib/i18n";
 import AppLayout from "@/components/AppLayout";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import RoleHome from "./pages/RoleHome";
 import Products from "./pages/Products";
 import Alerts from "./pages/Alerts";
