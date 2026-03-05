@@ -130,6 +130,13 @@ export default function Login() {
             {t("login.forgot")}
           </motion.button>
 
+          <p className="mt-2 text-center text-sm text-muted-foreground">
+            {t("login.noAccount")}{" "}
+            <span className="text-primary font-medium cursor-pointer" onClick={() => toast.info("Contactez votre manager pour créer un compte client.")}>
+              {t("login.registerLink")}
+            </span>
+          </p>
+
           <motion.div className="mt-6 rounded-lg border border-border bg-muted/50 p-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.4 }}>
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{t("login.demoAccounts")}</p>
             <div className="space-y-1.5 text-xs text-muted-foreground font-mono">

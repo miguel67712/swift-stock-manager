@@ -39,7 +39,7 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      const { error } = await signUp(email, password, fullName, "cashier");
+      const { error } = await signUp(email, password, fullName, "client");
       if (error) { setError(error); setLoading(false); return; }
       navigate("/", { replace: true });
     } catch {
