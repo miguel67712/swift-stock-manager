@@ -25,7 +25,15 @@ Deno.serve(async (req) => {
     const { data: existing } = await supabase.auth.admin.listUsers();
     const alreadyExists = existing?.users?.find((x: any) => x.email === u.email);
     if (alreadyExists) {
-      results.push(`${u.email} already exists`);
+      // Reset password to ensure demo credentials work
+      await supabase.auth.admin.updateUserById(alreadyExists.id, { password: u.password });
+      // Ensure profile exists
+      const { data: profileExists } = await supabase.from("profiles").select("id").eq("id", alreadyExists.id).maybeSingle();
+      if (!profileExists) {
+        await supabase.from("profiles").upsert({ id: alreadyExists.id, full_name: u.full_name, username: u.email.split("@")[0], role: u.role });
+        await supabase.from("user_roles").upsert({ user_id: alreadyExists.id, role: u.role });
+      }
+      results.push(`${u.email} updated`);
       continue;
     }
     const { error } = await supabase.auth.admin.createUser({
