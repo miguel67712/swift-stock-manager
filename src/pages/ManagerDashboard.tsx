@@ -198,11 +198,12 @@ export default function ManagerDashboard() {
 
       {/* Tabs */}
       <Tabs defaultValue="dashboard" className="space-y-4">
-        <TabsList>
+        <TabsList className="flex-wrap">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="products">Produits</TabsTrigger>
           <TabsTrigger value="inventory">Inventaire</TabsTrigger>
           <TabsTrigger value="reports">Rapports</TabsTrigger>
+          <TabsTrigger value="alerts">Alertes</TabsTrigger>
           <TabsTrigger value="clients">Clients</TabsTrigger>
         </TabsList>
 
