@@ -347,6 +347,62 @@ export default function ManagerDashboard() {
           </Card>
         </TabsContent>
 
+        {/* 5. Alertes (NEW) */}
+        <TabsContent value="alerts">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-destructive" /> Toutes les Alertes ({alerts.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {alerts.length === 0 ? (
+                <p className="text-sm text-muted-foreground flex items-center gap-2"><CheckCircle className="h-4 w-4 text-success" /> Aucune alerte</p>
+              ) : (
+                <>
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="p-3 rounded-lg border border-border text-center">
+                      <p className="text-xs text-muted-foreground">Non résolues</p>
+                      <p className="text-xl font-bold text-destructive">{unresolvedAlerts.length}</p>
+                    </div>
+                    <div className="p-3 rounded-lg border border-border text-center">
+                      <p className="text-xs text-muted-foreground">Rupture</p>
+                      <p className="text-xl font-bold text-destructive">{alerts.filter(a => !a.resolved && a.alert_type === "out_of_stock").length}</p>
+                    </div>
+                    <div className="p-3 rounded-lg border border-border text-center">
+                      <p className="text-xs text-muted-foreground">Stock Faible</p>
+                      <p className="text-xl font-bold text-warning">{alerts.filter(a => !a.resolved && a.alert_type === "low_stock").length}</p>
+                    </div>
+                  </div>
+                  {alerts.map(a => (
+                    <div key={a.id} className={`flex items-center justify-between py-2.5 px-3 rounded-md border ${a.resolved ? "border-border bg-muted/30 opacity-60" : "border-destructive/20 bg-destructive/5"}`}>
+                      <div className="flex items-center gap-3">
+                        {a.resolved ? <CheckCircle className="h-4 w-4 text-success shrink-0" /> : <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />}
+                        <div>
+                          <span className="text-sm font-medium text-foreground">{a.product_name}</span>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <Badge variant={a.alert_type === "out_of_stock" ? "destructive" : "outline"} className="text-[10px]">
+                              {a.alert_type === "out_of_stock" ? "Rupture" : "Stock Faible"}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">{a.current_quantity} unités</span>
+                            <span className="text-xs text-muted-foreground">• {new Date(a.created_at).toLocaleDateString("fr-FR")}</span>
+                          </div>
+                        </div>
+                      </div>
+                      {!a.resolved && (
+                        <Button size="sm" variant="outline" onClick={() => resolveAlert.mutate(a.id)} className="shrink-0">
+                          Résoudre
+                        </Button>
+                      )}
+                      {a.resolved && <span className="text-xs text-success">Résolu</span>}
+                    </div>
+                  ))}
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="clients">
           <Card>
             <CardHeader className="pb-3">
