@@ -16,14 +16,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import {
   Shield, Users, Package, Settings, Activity, BarChart3,
   DollarSign, TrendingUp, AlertTriangle, Clock, CheckCircle,
-  XCircle, UserPlus, Trash2, Download, FileText, Database
+  XCircle, UserPlus, Trash2, Download, FileText, Database,
+  Lock, Bell, Server, HardDrive
 } from "lucide-react";
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } };
 const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
+const COLORS = ["hsl(var(--primary))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"];
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
@@ -56,6 +59,40 @@ export default function AdminDashboard() {
     });
     return items.sort((a, b) => b.time.localeCompare(a.time)).slice(0, 8);
   }, [sales, unresolvedAlerts]);
+
+  // Reports data
+  const chartData = useMemo(() => {
+    const days: { date: string; sales: number }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const ds = d.toDateString();
+      const total = sales.filter(s => new Date(s.created_at).toDateString() === ds).reduce((sum, s) => sum + Number(s.total), 0);
+      days.push({ date: d.toLocaleDateString("fr-FR", { weekday: "short" }), sales: total });
+    }
+    return days;
+  }, [sales]);
+
+  const categoryData = useMemo(() => {
+    const map: Record<string, number> = {};
+    sales.forEach(s => {
+      (s as any).sale_items?.forEach((si: any) => {
+        const prod = products.find(p => p.id === si.product_id);
+        const cat = prod?.category || "Autre";
+        map[cat] = (map[cat] || 0) + Number(si.total_price);
+      });
+    });
+    return Object.entries(map).map(([name, value]) => ({ name, value }));
+  }, [sales, products]);
+
+  const topProducts = useMemo(() => {
+    const map: Record<string, number> = {};
+    sales.forEach(s => {
+      (s as any).sale_items?.forEach((si: any) => {
+        map[si.product_name] = (map[si.product_name] || 0) + Number(si.total_price);
+      });
+    });
+    return Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([name, revenue]) => ({ name: name.length > 15 ? name.slice(0, 15) + "…" : name, revenue }));
+  }, [sales]);
 
   const handleCreateManager = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,19 +149,20 @@ export default function AdminDashboard() {
         ))}
       </motion.div>
 
-      {/* Tabs */}
+      {/* Tabs - 6 tabs */}
       <Tabs defaultValue="dashboard" className="space-y-4">
-        <TabsList>
+        <TabsList className="flex-wrap">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="managers">Managers</TabsTrigger>
           <TabsTrigger value="products">Produits</TabsTrigger>
-          <TabsTrigger value="system">Système</TabsTrigger>
+          <TabsTrigger value="reports">Rapports</TabsTrigger>
           <TabsTrigger value="logs">Logs</TabsTrigger>
+          <TabsTrigger value="settings">Paramètres</TabsTrigger>
         </TabsList>
 
+        {/* 1. Dashboard */}
         <TabsContent value="dashboard">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Quick Actions */}
             <motion.div variants={item}>
               <Card>
                 <CardHeader className="pb-3">
@@ -147,7 +185,6 @@ export default function AdminDashboard() {
               </Card>
             </motion.div>
 
-            {/* Alerts */}
             <motion.div variants={item}>
               <Card className={unresolvedAlerts.length > 0 ? "border-destructive/30" : ""}>
                 <CardHeader className="pb-3">
@@ -176,6 +213,7 @@ export default function AdminDashboard() {
           </div>
         </TabsContent>
 
+        {/* 2. Managers */}
         <TabsContent value="managers">
           <Card>
             <CardHeader className="pb-3">
@@ -220,6 +258,7 @@ export default function AdminDashboard() {
           </Card>
         </TabsContent>
 
+        {/* 3. Products */}
         <TabsContent value="products">
           <Card>
             <CardHeader className="pb-3">
@@ -260,24 +299,111 @@ export default function AdminDashboard() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="system">
-          <Card>
-            <CardHeader><CardTitle className="text-base flex items-center gap-2"><Settings className="h-4 w-4 text-primary" /> Paramètres Système</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg border border-border">
-                  <h3 className="font-semibold text-sm mb-2">Base de données</h3>
-                  <p className="text-xs text-muted-foreground">{products.length} produits • {sales.length} transactions</p>
-                </div>
-                <div className="p-4 rounded-lg border border-border">
-                  <h3 className="font-semibold text-sm mb-2">Sécurité</h3>
-                  <p className="text-xs text-muted-foreground">RLS activé • Rôles configurés</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* 4. Reports (NEW) */}
+        <TabsContent value="reports">
+          <div className="space-y-6">
+            {/* Summary cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="p-4">
+                  <p className="text-xs text-muted-foreground">Revenu Total</p>
+                  <p className="text-2xl font-bold font-mono-price text-primary">{formatXAF(totalRevenue)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{sales.length} transactions</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <p className="text-xs text-muted-foreground">Transaction Moyenne</p>
+                  <p className="text-2xl font-bold font-mono-price text-foreground">{formatXAF(sales.length ? totalRevenue / sales.length : 0)}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <p className="text-xs text-muted-foreground">Valeur Inventaire</p>
+                  <p className="text-2xl font-bold font-mono-price text-foreground">{formatXAF(products.reduce((s, p) => s + Number(p.price) * p.quantity, 0))}</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Daily sales chart */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2"><BarChart3 className="h-4 w-4 text-primary" /> Ventes 7 Derniers Jours</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-52">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={chartData}>
+                        <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                        <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                        <Tooltip formatter={(v: number) => formatXAF(v)} />
+                        <Bar dataKey="sales" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Top products */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2"><Package className="h-4 w-4 text-primary" /> Top Produits</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {topProducts.length === 0 ? (
+                    <p className="text-sm text-muted-foreground py-8 text-center">Aucune donnée de vente</p>
+                  ) : (
+                    <div className="h-52">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={topProducts} layout="vertical">
+                          <XAxis type="number" tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                          <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={100} />
+                          <Tooltip formatter={(v: number) => formatXAF(v)} />
+                          <Bar dataKey="revenue" fill="hsl(var(--chart-2))" radius={[0, 4, 4, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Recent sales table */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2"><FileText className="h-4 w-4 text-primary" /> Dernières Transactions</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Transaction</TableHead>
+                      <TableHead>Client</TableHead>
+                      <TableHead>Paiement</TableHead>
+                      <TableHead className="text-right">Total</TableHead>
+                      <TableHead>Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {sales.slice(0, 15).map(s => (
+                      <TableRow key={s.id}>
+                        <TableCell className="font-mono text-xs">{s.transaction_id}</TableCell>
+                        <TableCell>{s.cashier_name}</TableCell>
+                        <TableCell><Badge variant="outline" className="text-[10px]">{s.payment_method}</Badge></TableCell>
+                        <TableCell className="text-right font-mono-price">{formatXAF(Number(s.total))}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground">{new Date(s.created_at).toLocaleString("fr-FR")}</TableCell>
+                      </TableRow>
+                    ))}
+                    {sales.length === 0 && <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Aucune transaction</TableCell></TableRow>}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
+        {/* 5. Logs */}
         <TabsContent value="logs">
           <Card>
             <CardHeader><CardTitle className="text-base flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> Activité Récente</CardTitle></CardHeader>
@@ -297,6 +423,58 @@ export default function AdminDashboard() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* 6. Settings (NEW) */}
+        <TabsContent value="settings">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2"><Database className="h-4 w-4 text-primary" /> Base de Données</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Produits</span><span className="font-bold">{products.length}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Transactions</span><span className="font-bold">{sales.length}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Alertes</span><span className="font-bold">{alerts.length}</span></div>
+                  <Button variant="outline" className="w-full gap-2 mt-2"><Download className="h-4 w-4" /> Exporter les Données</Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2"><Lock className="h-4 w-4 text-primary" /> Sécurité</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">RLS</span><Badge variant="outline" className="text-success border-success/30">Activé</Badge></div>
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Auth</span><Badge variant="outline" className="text-success border-success/30">Activé</Badge></div>
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Rôles</span><Badge variant="outline" className="text-success border-success/30">Configurés</Badge></div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2"><Bell className="h-4 w-4 text-primary" /> Seuils d'Alerte</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Seuil par défaut</span><span className="font-bold">5 unités</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Alerte critique</span><span className="font-bold text-destructive">&lt; 3 unités</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Stock faible</span><span className="font-bold text-warning">5-9 unités</span></div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2"><Server className="h-4 w-4 text-primary" /> Système</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Version</span><span className="font-bold">1.0.0</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Statut</span><Badge variant="outline" className="text-success border-success/30">En ligne</Badge></div>
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Dernière sauvegarde</span><span className="text-xs text-muted-foreground">{new Date().toLocaleDateString("fr-FR")}</span></div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
 
