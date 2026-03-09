@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { useI18n } from "@/lib/i18n";
 import { LayoutDashboard, Package, AlertTriangle, BarChart3, LogOut, Store, Globe, Shield, Users, Settings } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { motion, type Variants } from "framer-motion";
