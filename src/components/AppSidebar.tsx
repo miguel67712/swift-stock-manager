@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { useI18n } from "@/lib/i18n";
 import { LayoutDashboard, Package, AlertTriangle, BarChart3, LogOut, Store, Globe, Shield, Users, Settings } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { motion, type Variants } from "framer-motion";
@@ -80,6 +81,11 @@ export default function AppSidebar({ onNavigate }: AppSidebarProps) {
           <span>{lang === "fr" ? "English" : "Français"}</span>
           <Badge variant="secondary" className="ml-auto text-[10px] font-bold">{lang.toUpperCase()}</Badge>
         </motion.button>
+
+        <div className="flex items-center gap-3 px-3 py-2 mt-1">
+          <ThemeToggle />
+          <span className="text-xs text-sidebar-foreground/60">Thème</span>
+        </div>
       </motion.nav>
 
       {profile && (
