@@ -19,6 +19,7 @@ import {
   AlertTriangle, CheckCircle, Package, Receipt, User, LogOut, Globe,
   Eye, Heart, MapPin, RefreshCw
 } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const CATEGORIES = ["Tout", "Boissons", "Produits Laitiers", "Céréales & Pâtes", "Huiles & Condiments", "Conserves", "Snacks & Biscuits", "Hygiène & Entretien", "Fruits & Légumes", "Viandes & Poissons", "Boulangerie"];
 
