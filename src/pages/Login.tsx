@@ -75,9 +75,12 @@ export default function Login() {
 
       {/* Right form */}
       <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-12 bg-background relative">
-        <motion.button onClick={toggleLang} className="absolute top-4 right-4 flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shadow-sm" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <Globe className="h-3.5 w-3.5" /> {lang === "fr" ? "English" : "Français"}
-        </motion.button>
+        <div className="absolute top-4 right-4 flex items-center gap-2">
+          <ThemeToggle />
+          <motion.button onClick={toggleLang} className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shadow-sm" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Globe className="h-3.5 w-3.5" /> {lang === "fr" ? "English" : "Français"}
+          </motion.button>
+        </div>
 
         <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="w-full max-w-md">
           <motion.div className="lg:hidden flex items-center gap-3 mb-8" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
