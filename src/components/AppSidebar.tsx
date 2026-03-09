@@ -81,6 +81,11 @@ export default function AppSidebar({ onNavigate }: AppSidebarProps) {
           <span>{lang === "fr" ? "English" : "Français"}</span>
           <Badge variant="secondary" className="ml-auto text-[10px] font-bold">{lang.toUpperCase()}</Badge>
         </motion.button>
+
+        <div className="flex items-center gap-3 px-3 py-2 mt-1">
+          <ThemeToggle />
+          <span className="text-xs text-sidebar-foreground/60">Thème</span>
+        </div>
       </motion.nav>
 
       {profile && (

@@ -81,6 +81,7 @@ export default function ClientShop() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Button variant="ghost" size="sm" onClick={toggleLang} className="text-xs gap-1">
             <Globe className="h-3.5 w-3.5" /> {lang === "fr" ? "EN" : "FR"}
           </Button>
