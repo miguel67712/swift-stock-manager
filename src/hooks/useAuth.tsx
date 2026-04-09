@@ -40,9 +40,15 @@ const DEMO_ACCOUNTS: Record<string, { password: string; profile: Profile }> = {
 };
 
 function isDemoMode(): boolean {
-  // Use demo mode when in preview (fetch proxy breaks auth)
   try {
-    return window.location.hostname.includes("preview") || window.location.hostname.includes("lovable.app");
+    const hostname = window.location.hostname.toLowerCase();
+    return (
+      hostname.includes("preview") ||
+      hostname.includes("lovable.app") ||
+      hostname.includes("lovableproject.com") ||
+      hostname === "localhost" ||
+      hostname === "127.0.0.1"
+    );
   } catch {
     return false;
   }
