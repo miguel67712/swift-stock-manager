@@ -23,6 +23,31 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+// Demo accounts for offline/preview mode
+const DEMO_ACCOUNTS: Record<string, { password: string; profile: Profile }> = {
+  "admin@swift-mart.com": {
+    password: "admin123",
+    profile: { id: "demo-admin-id", full_name: "Admin Swift-Mart", username: "admin", role: "admin" },
+  },
+  "manager@swift-mart.com": {
+    password: "manager123",
+    profile: { id: "demo-manager-id", full_name: "Manager Swift-Mart", username: "manager", role: "manager" },
+  },
+  "client@swift-mart.com": {
+    password: "client123",
+    profile: { id: "demo-client-id", full_name: "Client Swift-Mart", username: "client", role: "client" },
+  },
+};
+
+function isDemoMode(): boolean {
+  // Use demo mode when in preview (fetch proxy breaks auth)
+  try {
+    return window.location.hostname.includes("preview") || window.location.hostname.includes("lovable.app");
+  } catch {
+    return false;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -45,7 +70,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Restore demo session from localStorage on mount
   useEffect(() => {
+    const demoMode = isDemoMode();
+
+    if (demoMode) {
+      const storedEmail = localStorage.getItem("swift-mart-demo-email");
+      if (storedEmail && DEMO_ACCOUNTS[storedEmail]) {
+        const demo = DEMO_ACCOUNTS[storedEmail];
+        setUser({ id: demo.profile.id, email: storedEmail } as User);
+        setSession({ user: { id: demo.profile.id, email: storedEmail } } as Session);
+        setProfile(demo.profile);
+      }
+      setIsLoading(false);
+      return;
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
@@ -72,11 +112,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [fetchProfile]);
 
   const signIn = useCallback(async (email: string, password: string) => {
+    // Demo mode: validate locally, no network call
+    if (isDemoMode()) {
+      const demo = DEMO_ACCOUNTS[email.toLowerCase().trim()];
+      if (!demo) return { error: "Compte non trouvé" };
+      if (demo.password !== password) return { error: "Mot de passe incorrect" };
+      
+      localStorage.setItem("swift-mart-demo-email", email.toLowerCase().trim());
+      setUser({ id: demo.profile.id, email } as User);
+      setSession({ user: { id: demo.profile.id, email } } as Session);
+      setProfile(demo.profile);
+      return { error: null };
+    }
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error: error?.message ?? null };
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, fullName: string, role: "admin" | "manager" | "cashier" | "client") => {
+    if (isDemoMode()) {
+      return { error: "L'inscription n'est pas disponible en mode démo" };
+    }
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -89,6 +145,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
+    if (isDemoMode()) {
+      localStorage.removeItem("swift-mart-demo-email");
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      return;
+    }
     await supabase.auth.signOut();
     setProfile(null);
   }, []);
